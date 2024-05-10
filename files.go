@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/csv"
+	"encoding/xml"
 	"fmt"
 	"os"
 	"path"
@@ -8,8 +10,72 @@ import (
 	"runtime"
 	"strings"
 
+	toml "github.com/pelletier/go-toml/v2"
+	log "github.com/sirupsen/logrus"
 )
 
+func LoadCsvFile(fileName string) (rows [][]string) {
+	// 获取数据，按照文件
+	file, errO := os.Open(AbsPath(fileName))
+	if errO != nil {
+		return nil
+	}
+	defer file.Close()
+	// 读取文件数据
+	rows, errC := csv.NewReader(file).ReadAll()
+	if errC != nil {
+		log.Errorf("解析csv %s 错误:%s", fileName, errC)
+		return nil
+	}
+	return
+}
+
+func LoadTomlFile(filename string, structPointer any) error {
+	fb, err := os.Open(AbsPath(filename))
+	if err != nil {
+		log.Error("读取文件错误:", err)
+		return err
+	}
+	defer fb.Close()
+	err = toml.NewDecoder(fb).Decode(structPointer)
+	if err != nil {
+		log.Errorf("解析toml %s 错误:%s", filename, err)
+		return err
+	}
+	return nil
+}
+
+// 直接覆盖文件,
+// 如果要编辑, 先load完整文件内容
+func WriteTomlFile(filename string, structPointer any) error {
+	fb, err := os.Create(AbsPath(filename))
+	if err != nil {
+		log.Error("打开文件错误:", err)
+		return err
+	}
+	defer fb.Close()
+	err = toml.NewEncoder(fb).Encode(structPointer)
+	if err != nil {
+		log.Errorf("写入toml %s 错误:%s", filename, err)
+		return err
+	}
+	return nil
+}
+
+func LoadXmlFile(filename string, structPointer any) error {
+	fb, err := os.Open(AbsPath(filename))
+	if err != nil {
+		log.Error("读取文件错误:", err)
+		return err
+	}
+	defer fb.Close()
+	err = xml.NewDecoder(fb).Decode(structPointer)
+	if err != nil {
+		log.Errorf("解析xml %s 错误:%s", filename, err)
+		return err
+	}
+	return nil
+}
 
 func BackupFile(filename string, newName string) error {
 	s := AbsPath(filename)
