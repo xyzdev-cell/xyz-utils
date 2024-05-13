@@ -2,22 +2,12 @@ package utils
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAbsPath(t *testing.T) {
-	s := AbsPath("./main.go")
-	fileinfo, err := os.Stat(s)
-	if !assert.NoError(t, err) {
-		t.Fatal()
-	} else {
-		println(fileinfo.Name())
-	}
-}
 
 func TestRandChoice(t *testing.T) {
 	slice1 := []int{1, 2, 3, 4}

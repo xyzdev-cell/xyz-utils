@@ -5,9 +5,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
-	"path"
-	"path/filepath"
-	"runtime"
 	"strings"
 
 	toml "github.com/pelletier/go-toml/v2"
@@ -16,7 +13,7 @@ import (
 
 func LoadCsvFile(fileName string) (rows [][]string) {
 	// 获取数据，按照文件
-	file, errO := os.Open(AbsPath(fileName))
+	file, errO := os.Open(fileName)
 	if errO != nil {
 		return nil
 	}
@@ -30,8 +27,8 @@ func LoadCsvFile(fileName string) (rows [][]string) {
 	return
 }
 
-func LoadTomlFile(filename string, structPointer any) error {
-	fb, err := os.Open(AbsPath(filename))
+func LoadTomlFile(fileName string, structPointer any) error {
+	fb, err := os.Open(fileName)
 	if err != nil {
 		log.Error("读取文件错误:", err)
 		return err
@@ -39,7 +36,7 @@ func LoadTomlFile(filename string, structPointer any) error {
 	defer fb.Close()
 	err = toml.NewDecoder(fb).Decode(structPointer)
 	if err != nil {
-		log.Errorf("解析toml %s 错误:%s", filename, err)
+		log.Errorf("解析toml %s 错误:%s", fileName, err)
 		return err
 	}
 	return nil
@@ -47,8 +44,8 @@ func LoadTomlFile(filename string, structPointer any) error {
 
 // 直接覆盖文件,
 // 如果要编辑, 先load完整文件内容
-func WriteTomlFile(filename string, structPointer any) error {
-	fb, err := os.Create(AbsPath(filename))
+func WriteTomlFile(fileName string, structPointer any) error {
+	fb, err := os.Create(fileName)
 	if err != nil {
 		log.Error("打开文件错误:", err)
 		return err
@@ -56,14 +53,14 @@ func WriteTomlFile(filename string, structPointer any) error {
 	defer fb.Close()
 	err = toml.NewEncoder(fb).Encode(structPointer)
 	if err != nil {
-		log.Errorf("写入toml %s 错误:%s", filename, err)
+		log.Errorf("写入toml %s 错误:%s", fileName, err)
 		return err
 	}
 	return nil
 }
 
-func LoadXmlFile(filename string, structPointer any) error {
-	fb, err := os.Open(AbsPath(filename))
+func LoadXmlFile(fileName string, structPointer any) error {
+	fb, err := os.Open(fileName)
 	if err != nil {
 		log.Error("读取文件错误:", err)
 		return err
@@ -71,30 +68,29 @@ func LoadXmlFile(filename string, structPointer any) error {
 	defer fb.Close()
 	err = xml.NewDecoder(fb).Decode(structPointer)
 	if err != nil {
-		log.Errorf("解析xml %s 错误:%s", filename, err)
+		log.Errorf("解析xml %s 错误:%s", fileName, err)
 		return err
 	}
 	return nil
 }
 
-func BackupFile(filename string, newName string) error {
-	s := AbsPath(filename)
-	fileinfo, err := os.Stat(s)
+func BackupFile(fileName string, newName string) error {
+	fileinfo, err := os.Stat(fileName)
 	if err != nil {
 		// 文件不存在 无需改名
 		return nil
 	}
 	if !fileinfo.IsDir() {
-		os.Rename(s, AbsPath(newName))
+		os.Rename(fileName, newName)
 	} else {
-		return fmt.Errorf("该路径是个目录: %s", filename)
+		return fmt.Errorf("该路径是个目录: %s", fileName)
 	}
 	return nil
 }
 
 // 写入文件, 注意文件已经存在会覆盖
-func WriteFile(filename string, rawContent []byte) error {
-	fb, err := os.Create(AbsPath(filename))
+func WriteFile(fileName string, rawContent []byte) error {
+	fb, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
@@ -102,20 +98,10 @@ func WriteFile(filename string, rawContent []byte) error {
 	if err != nil {
 		return err
 	} else if writeLen != len(rawContent) {
-		return fmt.Errorf("write file %s: len err, expect %d but: %d", filename, len(rawContent), writeLen)
+		return fmt.Errorf("write file %s: len err, expect %d but: %d", fileName, len(rawContent), writeLen)
 	}
 	return nil
 }
-
-/*
-RelativePath 应该以 **main.go** 所在文件夹为基准
-return 全路径.
-*/
-func AbsPath(RelativePath string) (allfilepath string) {
-	return filepath.Join(baseDir, RelativePath)
-}
-
-var baseDir = GetBaseDir() // main.go 所在文件夹
 
 /*
 为了统一 test mode 和 普通 mode 的不同基准目录.
@@ -124,20 +110,20 @@ var baseDir = GetBaseDir() // main.go 所在文件夹
 
 	runtime.Caller(0)
 */
-func GetBaseDir() string {
-	baseDir, err := os.Getwd()
-	if err != nil {
-		panic("os.Getw 获取当前路径出错")
-	}
-	if isRunInTestMode() {
-		_, filename, _, ok := runtime.Caller(0)
-		if !ok {
-			panic("runtime.Caller(0) 获取当前路径出错")
-		}
-		baseDir = filepath.Join(path.Dir(filename), "../")
-	}
-	return baseDir
-}
+// func GetBaseDir() string {
+// 	baseDir, err := os.Getwd()
+// 	if err != nil {
+// 		panic("os.Getw 获取当前路径出错")
+// 	}
+// 	if IsRunInTestMode() {
+// 		_, filename, _, ok := runtime.Caller(0)
+// 		if !ok {
+// 			panic("runtime.Caller(0) 获取当前路径出错")
+// 		}
+// 		baseDir = filepath.Join(path.Dir(filename), "../")
+// 	}
+// 	return baseDir
+// }
 
 /*
 // 1.8 版本之后失效, 可能test的参数附加不再走flag.
@@ -166,7 +152,7 @@ func GetBaseDir() string {
 	-test.count=1  // 可能没有, 取决于设置
 	-test.run=^TestIsQueueOK$
 */
-func isRunInTestMode() bool {
+func IsRunInTestMode() bool {
 	for _, arg := range os.Args {
 		if strings.HasPrefix(arg, "-test.") {
 			return true
