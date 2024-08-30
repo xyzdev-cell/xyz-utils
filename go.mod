@@ -7,6 +7,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
+	golang.org/x/text v0.17.0
 )
 
 require (
