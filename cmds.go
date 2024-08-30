@@ -25,8 +25,8 @@ func isWindowsUIChs() bool {
 }
 
 // 执行命令行命令
-func ExecCommand(command string, timeout time.Duration, args ...string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+func ExecCommandWithTimeout(command string, timeout time.Duration, args ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	cmd := exec.CommandContext(
 		ctx,
