@@ -8,21 +8,19 @@ import (
 	"strings"
 
 	toml "github.com/pelletier/go-toml/v2"
-	log "github.com/sirupsen/logrus"
 )
 
-func LoadCsvFile(fileName string) (rows [][]string) {
+func LoadCsvFile(fileName string) (rows [][]string, err error) {
 	// 获取数据，按照文件
-	file, errO := os.Open(fileName)
-	if errO != nil {
-		return nil
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
 	}
 	defer file.Close()
 	// 读取文件数据
-	rows, errC := csv.NewReader(file).ReadAll()
-	if errC != nil {
-		log.Errorf("解析csv %s 错误:%s", fileName, errC)
-		return nil
+	rows, err = csv.NewReader(file).ReadAll()
+	if err != nil {
+		return nil, err
 	}
 	return
 }
@@ -30,13 +28,11 @@ func LoadCsvFile(fileName string) (rows [][]string) {
 func LoadTomlFile(fileName string, structPointer any) error {
 	fb, err := os.Open(fileName)
 	if err != nil {
-		log.Error("读取文件错误:", err)
 		return err
 	}
 	defer fb.Close()
 	err = toml.NewDecoder(fb).Decode(structPointer)
 	if err != nil {
-		log.Errorf("解析toml %s 错误:%s", fileName, err)
 		return err
 	}
 	return nil
@@ -47,13 +43,11 @@ func LoadTomlFile(fileName string, structPointer any) error {
 func WriteTomlFile(fileName string, structPointer any) error {
 	fb, err := os.Create(fileName)
 	if err != nil {
-		log.Error("打开文件错误:", err)
 		return err
 	}
 	defer fb.Close()
 	err = toml.NewEncoder(fb).Encode(structPointer)
 	if err != nil {
-		log.Errorf("写入toml %s 错误:%s", fileName, err)
 		return err
 	}
 	return nil
@@ -62,13 +56,11 @@ func WriteTomlFile(fileName string, structPointer any) error {
 func LoadXmlFile(fileName string, structPointer any) error {
 	fb, err := os.Open(fileName)
 	if err != nil {
-		log.Error("读取文件错误:", err)
 		return err
 	}
 	defer fb.Close()
 	err = xml.NewDecoder(fb).Decode(structPointer)
 	if err != nil {
-		log.Errorf("解析xml %s 错误:%s", fileName, err)
 		return err
 	}
 	return nil
