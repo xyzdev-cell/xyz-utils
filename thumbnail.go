@@ -11,6 +11,10 @@ import (
 	"golang.org/x/image/draw"
 )
 
+/*
+生成缩略图
+输入: 宽或高为0时自动按比例缩放
+*/
 func Thumbnail(r io.Reader, w io.Writer, mimetype string, width int, height int) error {
 	var src image.Image
 	var err error
