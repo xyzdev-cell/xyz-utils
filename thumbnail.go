@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -10,7 +11,7 @@ import (
 	"golang.org/x/image/draw"
 )
 
-func Thumbnail(r io.Reader, w io.Writer, mimetype string, width int) error {
+func Thumbnail(r io.Reader, w io.Writer, mimetype string, width int, height int) error {
 	var src image.Image
 	var err error
 
@@ -26,7 +27,13 @@ func Thumbnail(r io.Reader, w io.Writer, mimetype string, width int) error {
 	}
 
 	ratio := (float64)(src.Bounds().Max.Y) / (float64)(src.Bounds().Max.X)
-	height := int(math.Round(float64(width) * ratio))
+	if width <= 0 {
+		width = int(math.Round(float64(height) / ratio))
+	} else if height <= 0 {
+		height = int(math.Round(float64(width) * ratio))
+	} else {
+		return fmt.Errorf("both width and height must be positive")
+	}
 
 	dst := image.NewRGBA(image.Rect(0, 0, width, height))
 

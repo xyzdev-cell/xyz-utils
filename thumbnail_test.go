@@ -9,7 +9,6 @@ import (
 func TestSample(t *testing.T) {
 	inputPath := "input.png"      // 输入文件路径
 	outputPath := "thumbnail.png" // 输出文件路径
-	width := 100                  // 缩略图宽度
 	inputFile, err := os.Open(inputPath)
 	if err != nil {
 		panic(err)
@@ -21,7 +20,7 @@ func TestSample(t *testing.T) {
 	}
 	defer outputFile.Close()
 
-	if err := Thumbnail(inputFile, outputFile, "image/png", width); err != nil {
+	if err := Thumbnail(inputFile, outputFile, "image/png", 0, 200); err != nil {
 		fmt.Println("错误:", err)
 	} else {
 		fmt.Println("缩略图生成成功:", outputPath)
