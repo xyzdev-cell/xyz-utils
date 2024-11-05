@@ -1,6 +1,6 @@
 //go:build !windows
 
-package utils
+package cmd
 
 func isWindowsUIChs() bool {
 	return false

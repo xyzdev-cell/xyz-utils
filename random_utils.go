@@ -2,7 +2,6 @@ package utils
 
 import (
 	"math/rand"
-	"time"
 )
 
 type anyUInt interface { // 目前没有支持 uint64
@@ -11,12 +10,6 @@ type anyUInt interface { // 目前没有支持 uint64
 
 type anyInt interface {
 	int | int8 | int16 | int32 | int64 | anyUInt
-}
-
-// var rands = newRandomSource()
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }
 
 // 在any切片中随机一个值
@@ -56,8 +49,3 @@ func RandIntRange[T anyInt](num1 T, num2 T) T {
 func RandAnyInt[T anyInt](max T) T {
 	return T(rand.Intn(int(max)))
 }
-
-// 随机源, 单次程序运行使用一次即可
-// func newRandomSource() *rand.Rand {
-// 	return rand.New(rand.NewSource(time.Now().Unix()))
-// }
