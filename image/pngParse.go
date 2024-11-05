@@ -107,23 +107,23 @@ func extractTextChunks(chunks []pngChunk) (map[string]string, error) {
 }
 
 // base64ToUtf8 converts a base64 string to a UTF-8 string.
-func base64ToUtf8(encoded string) (string, error) {
+func base64ToUtf8(encoded string) ([]byte, error) {
 	data, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(data), nil
+	return data, nil
 }
 
-func ExtractPngString(r io.Reader) (string, error) {
+func ExtractPngString(r io.Reader) ([]byte, error) {
 	chunks, err := ReadPNGChunks(r)
 	if err != nil {
-		return "", fmt.Errorf("reading PNG chunks: %w", err)
+		return nil, fmt.Errorf("reading PNG chunks: %w", err)
 	}
 
 	texts, err := extractTextChunks(chunks)
 	if err != nil {
-		return "", fmt.Errorf("extracting text chunks: %w", err)
+		return nil, fmt.Errorf("extracting text chunks: %w", err)
 	}
 
 	// Check for specific keywords and handle accordingly
@@ -140,5 +140,5 @@ func ExtractPngString(r io.Reader) (string, error) {
 			return decoded, nil
 		}
 	}
-	return "", errors.New("ccv3 or chara keyword not found in PNG file")
+	return nil, errors.New("ccv3 or chara keyword not found in PNG file")
 }
