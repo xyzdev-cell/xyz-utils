@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"hash/crc32"
-	"os"
+	"io"
 )
 
 // pngChunk represents a chunk in a PNG file.
@@ -18,16 +18,9 @@ type pngChunk struct {
 }
 
 // ReadPNGChunks reads the PNG file and extracts its chunks.
-func ReadPNGChunks(filePath string) ([]pngChunk, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	// Read the PNG signature
+func ReadPNGChunks(r io.Reader) ([]pngChunk, error) {
 	signature := make([]byte, 8)
-	if _, err := file.Read(signature); err != nil {
+	if _, err := r.Read(signature); err != nil {
 		return nil, err
 	}
 
@@ -40,23 +33,23 @@ func ReadPNGChunks(filePath string) ([]pngChunk, error) {
 		var chunk pngChunk
 
 		// Read chunk length
-		if err := binary.Read(file, binary.BigEndian, &chunk.Length); err != nil {
+		if err := binary.Read(r, binary.BigEndian, &chunk.Length); err != nil {
 			return nil, err
 		}
 
 		// Read chunk type
-		if _, err := file.Read(chunk.Type[:]); err != nil {
+		if _, err := r.Read(chunk.Type[:]); err != nil {
 			return nil, err
 		}
 
 		// Read chunk data
 		chunk.Data = make([]byte, chunk.Length)
-		if _, err := file.Read(chunk.Data); err != nil {
+		if _, err := r.Read(chunk.Data); err != nil {
 			return nil, err
 		}
 
 		// Read chunk CRC
-		if err := binary.Read(file, binary.BigEndian, &chunk.CRC); err != nil {
+		if err := binary.Read(r, binary.BigEndian, &chunk.CRC); err != nil {
 			return nil, err
 		}
 
@@ -122,8 +115,8 @@ func base64ToUtf8(encoded string) (string, error) {
 	return string(data), nil
 }
 
-func ExtractPngString(filePath string) (string, error) {
-	chunks, err := ReadPNGChunks(filePath)
+func ExtractPngString(r io.Reader) (string, error) {
+	chunks, err := ReadPNGChunks(r)
 	if err != nil {
 		return "", fmt.Errorf("reading PNG chunks: %w", err)
 	}

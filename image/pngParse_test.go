@@ -2,10 +2,17 @@ package image
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
 func TestExtractPngString(t *testing.T) {
 	inputPath := "../input.png" // 输入文件路径
-	fmt.Println(ExtractPngString(inputPath))
+	f, err := os.Open(inputPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+	fmt.Println(ExtractPngString(f))
 }
