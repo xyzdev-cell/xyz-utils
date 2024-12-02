@@ -1,7 +1,8 @@
-package utils
+package xyz_rand
 
 import (
 	"math/rand"
+	"strings"
 )
 
 type anyUInt interface { // 目前没有支持 uint64
@@ -48,4 +49,30 @@ func RandIntRange[T anyInt](num1 T, num2 T) T {
 
 func RandAnyInt[T anyInt](max T) T {
 	return T(rand.Intn(int(max)))
+}
+
+const (
+	letters = "abcdefghijklmnopqrstuvwxyz"
+	Numbers = "0123456789"
+)
+
+func RandStr(n int) string {
+	b := strings.Builder{}
+	b.Grow(n)
+	l := len(letters)
+	for i := 0; i < n; i++ {
+		b.WriteByte(letters[rand.Intn(l)])
+	}
+	return b.String()
+}
+
+func RandStrNum(n int) string {
+	b := strings.Builder{}
+	b.Grow(n)
+	base := letters + Numbers
+	l := len(base)
+	for i := 0; i < n; i++ {
+		b.WriteByte(base[rand.Intn(l)])
+	}
+	return b.String()
 }

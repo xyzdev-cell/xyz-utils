@@ -1,4 +1,4 @@
-package utils
+package xyz_rand
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/stretchr/testify/assert"
 )
-
 
 func TestRandChoice(t *testing.T) {
 	slice1 := []int{1, 2, 3, 4}
@@ -51,20 +50,6 @@ func TestRandomIntRange(t *testing.T) {
 
 type testTypeUser struct {
 	Csv []string `toml:"Csv"`
-}
-
-func TestStructToMap(t *testing.T) {
-	resMap, err := StructToMap(&testTypeUser{
-		Csv: []string{
-			"123",
-			"456",
-		},
-	}, "toml")
-	if err != nil {
-		t.Errorf("StructToMap error:%s", err)
-	} else {
-		fmt.Println("res map:", resMap)
-	}
 }
 
 func TestSliceRemove(t *testing.T) {
@@ -111,9 +96,8 @@ func TestSliceDedup(t *testing.T) {
 	assert.Equal(t, 4, len(newlist))
 }
 
-func Test_CsharpHash(t *testing.T) {
-	assert.Equal(t, int64(372029327), CsharpStringHashV1("3"))
-	assert.Equal(t, int64(372029326), CsharpStringHashV1("0"))
-	assert.Equal(t, int64(518336165), CsharpStringHashV1("MengHuan02"))
-	assert.Equal(t, int64(251214853), CsharpStringHashV1("Ball_sports"))
+func TestRandStrNum(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		fmt.Println(RandStrNum(i))
+	}
 }

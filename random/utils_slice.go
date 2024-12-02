@@ -1,4 +1,4 @@
-package utils
+package xyz_rand
 
 // RawSlice 切片 中删除 delSlice 中的所有元素
 // delList 不应比 RawSlice 长, 否则会 Panic!
