@@ -17,6 +17,8 @@ type pngChunk struct {
 	CRC    uint32
 }
 
+var pngSignature = "\x89PNG\r\n\x1a\n"
+
 // ReadPNGChunks reads the PNG file and extracts its chunks.
 func ReadPNGChunks(r io.Reader) ([]pngChunk, error) {
 	signature := make([]byte, 8)
@@ -24,7 +26,7 @@ func ReadPNGChunks(r io.Reader) ([]pngChunk, error) {
 		return nil, err
 	}
 
-	if string(signature) != "\x89PNG\r\n\x1a\n" {
+	if string(signature) != pngSignature {
 		return nil, errors.New("not a valid PNG file")
 	}
 

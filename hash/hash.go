@@ -1,5 +1,36 @@
 package xyz_hash
 
+import (
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/hex"
+	"hash"
+	"strings"
+)
+
+func HashString(s string, algorithm string) string {
+	var h hash.Hash
+
+	switch strings.ToLower(algorithm) {
+	case "md5":
+		h = md5.New()
+	case "sha1":
+		h = sha1.New()
+	case "sha256":
+		h = sha256.New()
+	case "sha512":
+		h = sha512.New()
+	default:
+		return ""
+	}
+
+	h.Write([]byte(s))
+	hashBytes := h.Sum(nil) // nil 表示不追加到已有的切片，创建一个新的切片
+	return hex.EncodeToString(hashBytes)
+}
+
 func CsharpStringHashV1(str string) int64 {
 	var num1, num2 int32 = 5381, 5381
 
